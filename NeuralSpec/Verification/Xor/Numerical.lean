@@ -1,7 +1,9 @@
-import NeuralSpec.Xor.Model
-import NeuralSpec.Xor.Data
+import NeuralSpec.Network.Xor.FloatLib
+import NeuralSpec.Model.Xor.Regions
 import NN.API.Trainer.Train.Loop
 import NN.API.Verification
+
+/-! Executable numerical checks; these reports are separate from the Lean correctness proof. -/
 
 namespace NeuralSpec.Xor
 
@@ -43,7 +45,7 @@ private def checkSubregions (trained : Trainer.Result [2] [2]) (region : Region)
   IO.println s!"  IBP 8x8 cover: minimum candidate margin={lowerMargin}; meets 1/4={met}"
   return met
 
-/-- Numerical verification only. The exact-real `XorSpec` theorem is a separate milestone. -/
+/-- Numerical verification only. The separate exact-real theorem covers a frozen checkpoint. -/
 def checkRegions (trained : Trainer.Result [2] [2]) : IO Nat := do
   let mut passed := 0
   IO.println "Numerical bound reports (not Lean proofs of XorSpec):"
@@ -54,21 +56,48 @@ def checkRegions (trained : Trainer.Result [2] [2]) : IO Nat := do
     let crownMet ← if ibpMet then pure true else checkWith trained region .crown
     let met ← if crownMet then pure true else checkSubregions trained region
     if met then passed := passed + 1
-  IO.println s!"Numerical margin checks: {passed}/4. Formal checkpoint proof: not yet implemented."
+  IO.println s!"Numerical margin checks: {passed}/4. These reports do not check checkpoint identity against the frozen Lean theorem."
   return passed
 
-def trainAndCheck (steps : Nat) (seed : Nat) (checkpoint : System.FilePath) : IO Unit := do
-  IO.println s!"XOR 2→4→2; seed={seed}; steps={steps}; CPU/native binary32"
-  let trained ← (trainer seed).train dataset
-    { steps := steps, samplesPerStep := 36, logEvery := max 1 (steps / 10) }
-  trained.printSummary
-  if let some parent := checkpoint.parent then IO.FS.createDirAll parent
-  trained.save checkpoint
-  IO.println s!"Saved trained parameters to {checkpoint}"
-  let _ ← checkRegions trained
+end NeuralSpec.Xor
 
-def loadAndCheck (checkpoint : System.FilePath) : IO Nat := do
-  let trained ← (trainer 7).load checkpoint dataset
-  checkRegions trained
+/-! ## Sampled native / FloatLib comparisons -/
+
+namespace NeuralSpec.Xor
+
+open FloatLib.Floats
+
+/-- A grid including rounded region boundaries, plus signed-zero and subnormal cases. -/
+def floatingParityInputs : Array (Float32 × Float32) := Id.run do
+  let mut inputs := #[]
+  for i in [0:21] do
+    for j in [0:21] do
+      inputs := inputs.push
+        ((i.toFloat / 20).toFloat32, (j.toFloat / 20).toFloat32)
+  let z := Float32.ofBits 0
+  let nz := Float32.ofBits 2147483648
+  let tiny := Float32.ofBits 1
+  let ntiny := Float32.ofBits 2147483649
+  inputs := inputs ++ #[(nz, z), (z, nz), (nz, nz), (tiny, z), (z, tiny), (ntiny, tiny)]
+  return inputs
+
+/-- Fail on nonfinite outputs or a difference in either output word for these sample inputs. -/
+def checkFloatingParity : IO Nat := do
+  let mut mismatches := 0
+  for x in floatingParityInputs do
+    let native := nativeNetwork x
+    let reference := floatLibNetwork
+      (ExecFloat.Binary.ofFloat32 x.1, ExecFloat.Binary.ofFloat32 x.2)
+    for label in ([0, 1] : List (Fin 2)) do
+      let actual := native label
+      let expected := reference label
+      if !actual.isFinite || !ExecFloat.Binary.isFinite expected ||
+          actual.toBits != ExecFloat.Binary.toBits32 expected then
+        if mismatches < 5 then
+          IO.println s!"Mismatch at {x.1}, {x.2}, output {label}: native bits={actual.toBits}, FloatLib bits={ExecFloat.Binary.toBits32 expected}"
+        mismatches := mismatches + 1
+  IO.println s!"Compared {floatingParityInputs.size} input pairs, both output words; mismatches={mismatches}."
+  IO.println "Regression evidence only; this is not a proof of floating-point XorSpec."
+  return mismatches
 
 end NeuralSpec.Xor

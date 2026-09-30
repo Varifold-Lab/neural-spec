@@ -1,12 +1,9 @@
-import Mathlib.Basic.Real.Basic
+import NeuralSpec.Model.Xor.Types
 import Mathlib.Tactic.Linarith
 
 /-! Exact-real specification of XOR on four closed input boxes. -/
 
 namespace NeuralSpec.Xor
-
-abbrev Point := ℝ × ℝ
-abbrev Network := Point → Fin 2 → ℝ
 
 /-- `false` denotes the low band, `true` the high band. -/
 def InBand (high : Bool) (x : ℝ) : Prop :=

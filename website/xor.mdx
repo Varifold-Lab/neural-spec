@@ -1,0 +1,173 @@
+import { XorAnimation } from './components/XorAnimation.jsx';
+import { MathStatement } from './components/MathStatement.jsx';
+
+# XOR
+
+XOR (exclusive OR) assigns to two bits $a,b\in\{0,1\}$ the label $a\oplus b=(a+b)\bmod 2$: 1 when they differ and 0 when they agree. This case verifies a trained network on continuous regions around the four binary inputs.
+
+<h2 id="network">Network</h2>
+
+\begin{definition}[Trained network over the reals]
+
+Let $x=(x_1,x_2)\in\R^2$. The frozen parameters are
+
+$$
+\begin{aligned}
+W_1&\in\R^{4\times2}, & b_1&\in\R^4,\\
+W_2&\in\R^{2\times4}, & b_2&\in\R^2.
+\end{aligned}
+$$
+
+Each coefficient is the exact rational value of a trained binary32 parameter, recorded in [the parameter definition](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Network/Xor/Parameters.lean). Define $\ReLU(t)=\max\{0,t\}$, applied coordinatewise to vectors. The preactivation and hidden maps $a,h:\R^2\to\R^4$ and the score function $z:\R^2\to\R^2$ are
+
+$$
+\begin{aligned}
+a(x)&=W_1x+b_1,\\
+h(x)&=\ReLU(a(x)),\\
+z(x)&=W_2h(x)+b_2.
+\end{aligned}
+$$
+
+The four hidden coordinates are indexed by $i\in\{0,1,2,3\}$; the two class scores are $z_0(x)$ and $z_1(x)$. All operations in this definition use exact real arithmetic.
+
+\end{definition}
+
+The hidden layer multiplies inputs by weights, adds biases, and sets negative results to zero. The output layer combines the hidden values into two scores; the larger score selects the class. Scores are not probabilities. Training fixes the 22 coefficients after 1,000 Adam steps with seed 7, using 36 labelled examples.
+
+<h2 id="specification">Specification</h2>
+
+\begin{definition}[Input regions and correct labels]
+
+Define the two closed bands and four boxes by
+
+$$
+\begin{aligned}
+B_0=L&=\left[0,\frac15\right],\\
+B_1=H&=\left[\frac45,1\right],\\
+D_{ab}&=B_a\times B_b,\qquad
+D=\bigcup_{a,b\in\{0,1\}}D_{ab}.
+\end{aligned}
+$$
+
+The boxes are disjoint, so the correct-label function $y:D\to\{0,1\}$ is well-defined by $y(x)=a\oplus b$ for $x\in D_{ab}$. Thus $L\times L$ and $H\times H$ have label 0; the other two boxes have label 1. No property is specified outside $D$.
+
+\end{definition}
+
+\begin{definition}[Correct-class margin and XOR specification]
+
+For any score function $f:\R^2\to\R^2$, its correct-class margin on $D$ is
+
+$$
+m_f(x)=f_{y(x)}(x)-f_{1-y(x)}(x).
+$$
+
+The regional specification is the predicate
+
+$$
+\begin{aligned}
+&\XorSpec(f)\quad\Longleftrightarrow\\
+&\quad\forall a,b\in\{0,1\},\ \forall x\in D_{ab},\\
+&\qquad m_f(x)\ge\frac14.
+\end{aligned}
+$$
+
+This is the mathematical form of [`XorSpec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Spec.lean). A positive margin makes the correct score strictly larger, independently of any rule for ties.
+
+\end{definition}
+
+\begin{theorem}[Regional XOR correctness over the reals]
+
+The frozen trained network $z$ satisfies $\XorSpec(z)$. In fact,
+
+$$
+\forall x\in D,\qquad m_z(x)\ge\frac12.
+$$
+
+Lean checks [`trainedNetwork_satisfies_spec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Correctness.lean) and the stronger `trainedNetwork_margin_half` theorem.
+
+\end{theorem}
+
+\begin{proof}
+
+Fixing the signs of the four preactivations $a_i(x)$ makes the margin affine. For each box and each activation case, substituting the frozen rational coefficients reduces the claim to linear inequalities, which Lean discharges. The bounds include every point on each box's boundary.
+
+\end{proof}
+
+<XorAnimation />
+
+<h2 id="proof">Binary32 arithmetic</h2>
+
+\begin{definition}[Rounded evaluation]
+
+Let $\RN$ denote binary32 rounding to nearest with ties to even and gradual underflow. A finite result is identified with its exact real value. Round each original input coordinate once:
+
+$$
+\bar x=\bigl(\RN(x_1),\RN(x_2)\bigr).
+$$
+
+Write $\widehat z_k(x)$ for the decoded class-$k$ score obtained by running the frozen network on $\bar x$. Each multiplication and addition rounds separately, sums associate to the left, and biases are added last. Define the decoded score difference and its separately rounded margin by
+
+$$
+\begin{aligned}
+d(x)&=\widehat z_{y(x)}(x)-\widehat z_{1-y(x)}(x),\\
+\widehat m(x)&=\RN(d(x)).
+\end{aligned}
+$$
+
+The label $y(x)$ refers to the original real input, including band endpoints that are not exactly representable in binary32.
+
+\end{definition}
+
+\begin{theorem}[Regional XOR correctness in the binary32 model]
+
+For every $x\in D$, both computed scores and the rounded margin are finite, and
+
+$$
+\widehat m(x)\ge\frac14.
+$$
+
+Lean checks [`floatLibNetwork_margin_real`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/FloatingPoint.lean) for the scores and `floatLibNetwork_sub_margin_real` for the rounded subtraction.
+
+\end{theorem}
+
+\begin{proof}
+
+Input rounding and the forward computation give $|\widehat z_k(x)-z_k(x)|\le9/128$ for each $k\in\{0,1\}$. ReLU does not increase error. The final subtraction introduces at most $1/1024$ additional error. Combining these bounds with Theorem 1 yields
+
+$$
+\begin{aligned}
+\widehat m(x)
+&\ge\frac12-2\cdot\frac{9}{128}-\frac1{1024}\\
+&=\frac{367}{1024}>\frac14.
+\end{aligned}
+$$
+
+\end{proof}
+
+Both theorems are checked by Lean's kernel for the frozen parameters and the stated arithmetic. Whole-network correspondence with native execution, decimal input parsing, and deployed hardware remains unproved. A numerical report or checker result does not establish either universal theorem for a new checkpoint.
+
+<h2 id="reproduce">Reproduce</h2>
+
+Requires elan and a C compiler. Dependencies are pinned; no checkpoint is needed to build the proofs.
+
+```sh
+git clone https://github.com/Varifold-Lab/neural-spec.git
+cd neural-spec
+lake exe cache get
+lake build
+lake env lean scripts/Audit.lean
+lake exe xor infer ieee 0.1 0.9
+```
+
+<details>
+  <summary>Training and numerical checks</summary>
+
+```sh
+lake exe xor smoke
+lake exe xor train 1000 7 artifacts/xor.state
+lake exe xor check artifacts/xor.state
+lake exe xor parity
+```
+
+  <p><code>check</code> reloads the trained weights. New checkpoints require new proofs.</p>
+</details>

@@ -1,0 +1,22 @@
+import NeuralSpec.Network
+
+-- The network entry point must not import a specification, proof, trainer, or checker.
+assert_not_exists NeuralSpec.Xor.XorSpec
+assert_not_exists NeuralSpec.Xor.trainedNetwork_satisfies_spec
+assert_not_exists NeuralSpec.Xor.Checkpoint.parameters_match_source_bits
+assert_not_exists NeuralSpec.Xor.floatLib_network_eq_operationSpec
+assert_not_exists NeuralSpec.Xor.floatLib_parameters_exact
+assert_not_exists NeuralSpec.Xor.FloatingXorSpec
+assert_not_exists NeuralSpec.Xor.floatLibNetwork_satisfies_spec
+assert_not_exists NeuralSpec.Xor.floatLibNetwork_margin_real
+assert_not_exists NeuralSpec.Xor.floatLibNetwork_sub_margin_real
+assert_not_exists NeuralSpec.FloatingError.Approx
+assert_not_exists NeuralSpec.FloatingError.round_error
+assert_not_exists NeuralSpec.Xor.trainer
+assert_not_exists NeuralSpec.Xor.checkRegions
+
+#check NeuralSpec.Xor.model
+#check NeuralSpec.Xor.trainedNetwork
+
+#check NeuralSpec.Xor.nativeNetwork
+#check NeuralSpec.Xor.floatLibNetwork
