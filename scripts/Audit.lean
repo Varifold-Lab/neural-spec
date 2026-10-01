@@ -1,5 +1,6 @@
 import NeuralSpec
 
+#print axioms NeuralSpec.Robustness.correct_of_margin
 #print axioms NeuralSpec.Xor.Checkpoint.parameters_match_source_bits
 #print axioms NeuralSpec.Xor.trainedNetwork_satisfies_spec
 #print axioms NeuralSpec.Xor.trainedNetwork_correct_label

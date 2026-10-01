@@ -1,5 +1,5 @@
 import NeuralSpec.Network.Xor.Real
-import NeuralSpec.Verification.Xor.Spec
+import NeuralSpec.Verification.Xor.Robustness.Spec
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.SplitIfs
 

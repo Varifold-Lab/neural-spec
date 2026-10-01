@@ -1,5 +1,6 @@
 import NeuralSpec.Model.Xor.Types
-import Mathlib.Tactic.Linarith
+import NeuralSpec.Verification.Shared.Properties.Robustness.Margin
+import Mathlib.Tactic.NormNum
 
 /-! Exact-real specification of XOR on four closed input boxes. -/
 
@@ -32,6 +33,6 @@ theorem XorSpec.correct_label {network : Network} (h : XorSpec network)
       score network x (expectedLabel highX highY) := by
   have hm := h highX highY x hx
   unfold margin at hm
-  linarith
+  exact Robustness.correct_of_margin (by norm_num) hm
 
 end NeuralSpec.Xor

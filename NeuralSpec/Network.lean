@@ -1,3 +1,5 @@
+import NeuralSpec.Network.Architectures.MLP.Architecture
+import NeuralSpec.Network.Architectures.MLP.ScalarOps
 import NeuralSpec.Network.Xor.Architecture
 import NeuralSpec.Network.Xor.Parameters
 import NeuralSpec.Network.Xor.Real

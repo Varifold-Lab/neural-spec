@@ -12,10 +12,13 @@ assert_not_exists NeuralSpec.Xor.floatLibNetwork_margin_real
 assert_not_exists NeuralSpec.Xor.floatLibNetwork_sub_margin_real
 assert_not_exists NeuralSpec.FloatingError.Approx
 assert_not_exists NeuralSpec.FloatingError.round_error
+assert_not_exists NeuralSpec.Robustness.correct_of_margin
 assert_not_exists NeuralSpec.Xor.trainer
 assert_not_exists NeuralSpec.Xor.checkRegions
 
 #check NeuralSpec.Xor.model
+#check NeuralSpec.MLP.oneHiddenLayer
+#check NeuralSpec.MLP.ScalarOps
 #check NeuralSpec.Xor.trainedNetwork
 
 #check NeuralSpec.Xor.nativeNetwork

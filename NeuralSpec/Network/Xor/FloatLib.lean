@@ -16,7 +16,7 @@ open FloatLib.Floats
 def floatLibParameter (index : Nat) : Binary32 :=
   ExecFloat.Binary.ofBits32 (parameterBits32 index)
 
-def floatLibOps : ForwardOps Binary32 :=
+def floatLibOps : MLP.ScalarOps Binary32 :=
   ⟨(· + ·), (· * ·), floatLibRelu⟩
 
 def floatLibNetwork (x : Binary32 × Binary32) : Fin 2 → Binary32 :=

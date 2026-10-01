@@ -1,5 +1,5 @@
 import NeuralSpec.Training.Xor.Run
-import NeuralSpec.Verification.Xor.Numerical
+import NeuralSpec.Verification.Xor.Robustness.Numerical
 import NN.API.CLI.Parser
 
 -- The executable composes independent training and numerical-checking workflows.

@@ -4,7 +4,7 @@ namespace NeuralSpec.Xor
 
 open TorchLean
 
-/-- A named numerical box; its exact-real counterpart is defined in `Verification.Xor.Spec`. -/
+/-- A named numerical box; its exact-real counterpart is in `Verification.Xor.Robustness.Spec`. -/
 structure Region where
   name : String
   highX : Bool

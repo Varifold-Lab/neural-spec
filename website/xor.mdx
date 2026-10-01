@@ -71,7 +71,7 @@ $$
 \end{aligned}
 $$
 
-This is the mathematical form of [`XorSpec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Spec.lean). A positive margin makes the correct score strictly larger, independently of any rule for ties.
+This is the mathematical form of [`XorSpec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Robustness/Spec.lean). A positive margin makes the correct score strictly larger, independently of any rule for ties.
 
 \end{definition}
 
@@ -83,7 +83,7 @@ $$
 \forall x\in D,\qquad m_z(x)\ge\frac12.
 $$
 
-Lean checks [`trainedNetwork_satisfies_spec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Correctness.lean) and the stronger `trainedNetwork_margin_half` theorem.
+Lean checks [`trainedNetwork_satisfies_spec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Robustness/Correctness.lean) and the stronger `trainedNetwork_margin_half` theorem.
 
 \end{theorem}
 
@@ -126,7 +126,7 @@ $$
 \widehat m(x)\ge\frac14.
 $$
 
-Lean checks [`floatLibNetwork_margin_real`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/FloatingPoint.lean) for the scores and `floatLibNetwork_sub_margin_real` for the rounded subtraction.
+Lean checks [`floatLibNetwork_margin_real`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Xor/Robustness/FloatingPoint.lean) for the scores and `floatLibNetwork_sub_margin_real` for the rounded subtraction.
 
 \end{theorem}
 

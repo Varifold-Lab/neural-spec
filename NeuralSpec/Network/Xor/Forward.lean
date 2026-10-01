@@ -1,5 +1,7 @@
+import NeuralSpec.Network.Architectures.MLP.ScalarOps
+
 /-!
-# Shared scalar forward program
+# Scalar forward program for the XOR architecture
 
 Both executable floating-point backends use this exact sequence of operations.
 Products are rounded separately, additions associate to the left, and bias is
@@ -9,14 +11,8 @@ Parameter indices follow the frozen checkpoint's row-major tensor order.
 
 namespace NeuralSpec.Xor
 
-/-- Arithmetic choices for the same 2 → 4 ReLU → 2 forward computation. -/
-structure ForwardOps (α : Type) where
-  add : α → α → α
-  mul : α → α → α
-  relu : α → α
-
 /-- One forward program, independent of scalar representation and proof obligations. -/
-def forward {α : Type} (ops : ForwardOps α) (parameter : Nat → α)
+def forward {α : Type} (ops : MLP.ScalarOps α) (parameter : Nat → α)
     (x : α × α) (label : Fin 2) : α :=
   let h0 := ops.relu (ops.add (ops.add
     (ops.mul (parameter 0) x.1) (ops.mul (parameter 1) x.2)) (parameter 8))

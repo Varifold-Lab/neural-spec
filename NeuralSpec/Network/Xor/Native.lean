@@ -16,7 +16,7 @@ def nativeRelu (x : Float32) : Float32 :=
   if x.isNaN then x
   else if Float32.ofBits 0 < x then x else Float32.ofBits 0
 
-def nativeOps : ForwardOps Float32 :=
+def nativeOps : MLP.ScalarOps Float32 :=
   ⟨(· + ·), (· * ·), nativeRelu⟩
 
 def nativeNetwork (x : Float32 × Float32) : Fin 2 → Float32 :=

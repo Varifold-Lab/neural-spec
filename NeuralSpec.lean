@@ -1,2 +1,2 @@
-import NeuralSpec.Verification.Xor.Correctness
-import NeuralSpec.Verification.Xor.FloatingPoint
+import NeuralSpec.Verification.Xor.Robustness.Correctness
+import NeuralSpec.Verification.Xor.Robustness.FloatingPoint

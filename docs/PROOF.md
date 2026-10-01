@@ -4,7 +4,7 @@ The proofs concern the frozen XOR network trained with seed `7` for `1000` Adam 
 
 ## Domain and claim
 
-The exact specification is [Spec.lean](../NeuralSpec/Verification/Xor/Spec.lean). Let `L = [0, 1/5]` and `H = [4/5, 1]`:
+The exact specification is [Spec.lean](../NeuralSpec/Verification/Xor/Robustness/Spec.lean). Let `L = [0, 1/5]` and `H = [4/5, 1]`:
 
 | Input region | Correct class |
 | --- | --- |
@@ -37,11 +37,11 @@ The real-input floating-point theorems assume only membership in the region. Inp
 
 ## How the proof works
 
-[Correctness.lean](../NeuralSpec/Verification/Xor/Correctness.lean) substitutes the exact rational weights into the real-valued network, splits the four regions and ReLU activation cases, and proves the resulting linear inequalities.
+[Correctness.lean](../NeuralSpec/Verification/Xor/Robustness/Correctness.lean) substitutes the exact rational weights into the real-valued network, splits the four regions and ReLU activation cases, and proves the resulting linear inequalities.
 
-[FloatingError.lean](../NeuralSpec/Verification/Shared/FloatingError.lean) connects the actual FloatLib operations to nearest-even binary32 arithmetic with gradual underflow. It proves finiteness and conservative rounding bounds, including signed zero and subnormals. ReLU does not increase error. These lemmas live in `NeuralSpec.FloatingError` and can be imported without XOR. Their current premises use operation magnitude at most `128`, rounding error at most `1/1024`, and exact coefficients of magnitude at most `2` for parameter multiplication; another example must establish those premises or extend the lemmas.
+[FloatingError.lean](../NeuralSpec/Verification/Shared/Arithmetic/FloatingError.lean) connects the actual FloatLib operations to nearest-even binary32 arithmetic with gradual underflow. It proves finiteness and conservative rounding bounds, including signed zero and subnormals. ReLU does not increase error. These lemmas live in `NeuralSpec.FloatingError` and can be imported without XOR. Their current premises use operation magnitude at most `128`, rounding error at most `1/1024`, and exact coefficients of magnitude at most `2` for parameter multiplication; another example must establish those premises or extend the lemmas.
 
-[FloatingPoint.lean](../NeuralSpec/Verification/Xor/FloatingPoint.lean) composes those bounds through the shared [forward program](../NeuralSpec/Network/Xor/Forward.lean). Multiplications and additions are separate; sums associate to the left and biases are added last. Each output differs from the ideal real output by at most `9/128`, including input conversion. Another `1/1024` covers the final subtraction:
+[FloatingPoint.lean](../NeuralSpec/Verification/Xor/Robustness/FloatingPoint.lean) composes those bounds through the shared [forward program](../NeuralSpec/Network/Xor/Forward.lean). Multiplications and additions are separate; sums associate to the left and biases are added last. Each output differs from the ideal real output by at most `9/128`, including input conversion. Another `1/1024` covers the final subtraction:
 
 ```text
 rounded_margin ≥ 1/2 - 2 × (9/128) - 1/1024 = 367/1024 > 1/4

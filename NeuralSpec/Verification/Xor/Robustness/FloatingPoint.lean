@@ -1,5 +1,5 @@
-import NeuralSpec.Verification.Xor.Correctness
-import NeuralSpec.Verification.Shared.FloatingError
+import NeuralSpec.Verification.Xor.Robustness.Correctness
+import NeuralSpec.Verification.Shared.Arithmetic.FloatingError
 import NeuralSpec.Network.Xor.FloatLib
 import NeuralSpec.Network.Xor.Real
 import FloatLib.Floats.Formats.IEEE754.Native.AddSub
@@ -20,7 +20,7 @@ namespace NeuralSpec.Xor
 open FloatLib.Floats
 
 /-- Reference operations specified by FloatLib's floating-point format. -/
-def floatLibOperationSpecOps : ForwardOps Binary32 :=
+def floatLibOperationSpecOps : MLP.ScalarOps Binary32 :=
   ⟨ExecFloat.Spec.add, ExecFloat.Spec.mul, floatLibRelu⟩
 
 def floatLibOperationSpecNetwork (x : Binary32 × Binary32) : Fin 2 → Binary32 :=
@@ -62,7 +62,7 @@ theorem native_add_import (x y : Float32) (hx : x.isFinite = true) (hy : y.isFin
 
 /-- The shared program, interpreted over the reals, is the already-proved network. -/
 theorem forward_real_eq_trainedNetwork (x : Point) (label : Fin 2) :
-    forward (⟨(· + ·), (· * ·), max 0⟩ : ForwardOps ℝ)
+    forward (⟨(· + ·), (· * ·), max 0⟩ : MLP.ScalarOps ℝ)
       (fun i => ((Checkpoint.parameters[i]?).getD 0 : ℝ)) x label =
       trainedNetwork x label := by
   simp [forward, trainedNetwork, pre0, pre1, pre2, pre3, Checkpoint.parameters]
@@ -114,7 +114,7 @@ theorem forward_approx (p : Nat → Binary32) (q : Nat → ℝ)
     (hx : Approx x.1 r.1 1 (1 / 1024)) (hy : Approx x.2 r.2 1 (1 / 1024))
     (label : Fin 2) :
     Approx (forward floatLibOps p x label)
-      (forward (⟨(· + ·), (· * ·), max 0⟩ : ForwardOps ℝ) q r label) 50 (9 / 128) := by
+      (forward (⟨(· + ·), (· * ·), max 0⟩ : MLP.ScalarOps ℝ) q r label) 50 (9 / 128) := by
   have h0 := hidden_approx (hp 0 (by decide)) (hp 1 (by decide)) (hp 8 (by decide)) hx hy
   have h1 := hidden_approx (hp 2 (by decide)) (hp 3 (by decide)) (hp 9 (by decide)) hx hy
   have h2 := hidden_approx (hp 4 (by decide)) (hp 5 (by decide)) (hp 10 (by decide)) hx hy
