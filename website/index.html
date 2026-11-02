@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>neural-spec — XOR verification</title>
-  <meta name="description" content="Specification, proof, and reproduction commands for a trained XOR classifier in Lean, over exact reals and a binary32 arithmetic model.">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
   <meta name="theme-color" content="#195abe">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="assets/katex/katex.min.css">
   <link rel="stylesheet" href="assets/style.css?v={{style_version}}">
   <script type="module" src="assets/page.js"></script>
 </head>
-<body>
+<body data-case="{{case}}">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="header-inner">
@@ -20,6 +20,11 @@
     </div>
   </header>
   <main id="main" class="article">{{article}}</main>
-  <footer class="site-footer"><span>neural-spec · A Varifold community learning project.</span></footer>
+  <footer class="site-footer">
+    <div class="varifold-about">
+      <h2><a href="https://varifold-lab.github.io/">Varifold</a></h2>
+      <p>Varifold is an open learning community studying formal verification, interpretability, and mathematical foundations of AI safety. We develop and share notes, tools, and open-source projects to support learning and verifiable knowledge discovery.</p>
+    </div>
+  </footer>
 </body>
 </html>

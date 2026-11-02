@@ -1,6 +1,6 @@
 import { renderToString } from 'react-dom/server';
 import Page from './Page.jsx';
 
-export function renderPage() {
-  return renderToString(<Page />);
+export function renderPage(name) {
+  return renderToString(<Page name={name} />);
 }

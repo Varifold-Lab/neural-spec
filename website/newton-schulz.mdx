@@ -1,0 +1,135 @@
+import { MathStatement } from './components/MathStatement.jsx';
+
+# Newton–Schulz
+
+This case verifies a matrix iteration used inside the [Muon optimizer](https://kellerjordan.github.io/posts/muon/). Muon processes a gradient momentum matrix before updating model parameters. Here the algorithm is the quintic iteration core; verification establishes its matrix identities, scalar limitations, and matrix multiplication cost. No trained checkpoint is involved.
+
+<h2 id="algorithm">Algorithm</h2>
+
+\begin{definition}[Quintic iteration over the reals]
+
+For $X\in\R^{m\times n}$ and real coefficients $a,b,c$, define
+
+$$
+\begin{aligned}
+A&=XX^\top,\\
+F(X)&=aX+(bA+cA^2)X,\\
+\varphi(x)&=ax+bx^3+cx^5.
+\end{aligned}
+$$
+
+The Muon instance uses the exact rational coefficients
+
+$$
+(a,b,c)=\left(\frac{34445}{10000},-\frac{47750}{10000},\frac{20315}{10000}\right).
+$$
+
+Starting from a supplied matrix $X_0$, define $X_{k+1}=F(X_k)$ and return $X_5$. The notation $F^k$ and $\varphi^k$ means repeated composition, with the zeroth iterate equal to the identity.
+
+\end{definition}
+
+The [generic model](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Model/NewtonSchulz.lean) defines the iteration once. The [Muon configuration](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Model/NewtonSchulz/Muon.lean) selects the coefficients and five steps. Every operation above is exact real arithmetic; the decimal coefficients are not floating-point encodings.
+
+The role of the iteration is to move nonzero singular values toward an approximately unit scale. A supplied tall matrix can be transposed before iteration and transposed back afterwards, so the computational orientation has $m\le n$ and a Gram matrix of size $m\times m$.
+
+<h2 id="verification">Iteration verification</h2>
+
+\begin{theorem}[Five-step matrix specification]
+
+Let $U\in\R^{m\times r}$ and $V\in\R^{n\times r}$ satisfy $U^\top U=V^\top V=I_r$, and let $s\in\R^r$. Then
+
+$$
+F^5\!\left(U\operatorname{diag}(s)V^\top\right)
+=U\operatorname{diag}\!\left(\varphi^5(s)\right)V^\top,
+$$
+
+where the scalar map is applied coordinatewise. For any supplied $X$ and vector $v$, the same iteration also satisfies
+
+$$
+\begin{aligned}
+F^5(X^\top)&=F^5(X)^\top,\\
+Xv=0&\ \Longrightarrow\ F^5(X)v=0.
+\end{aligned}
+$$
+
+Lean checks [`muonIteration_satisfies_spec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/NewtonSchulz/Iteration/Correctness.lean) against [`MuonIterationSpec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/NewtonSchulz/Iteration/Spec.lean).
+
+\end{theorem}
+
+\begin{proof}
+
+Orthonormality reduces the Gram matrix to $U\operatorname{diag}(s^2)U^\top$. Multiplication then gives one step as $U\operatorname{diag}(as+bs^3+cs^5)V^\top$; induction gives any finite number of steps. Transpose equivalence follows from matrix associativity. Every update factors through $X$ on the right, which preserves vectors annihilated by $X$.
+
+\end{proof}
+
+The [shared proofs](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Shared/Arithmetic/NewtonSchulz.lean) work for arbitrary coefficients and finite dimensions. A supplied orthonormal frame is a premise; the theorem does not construct an SVD. Nonnegative entries of $s$ permit the singular-value interpretation. Zero entries stay zero, and nonzero entries need not become exactly one.
+
+\begin{theorem}[Scalar limitations]
+
+For every finite $k$ and $\varepsilon>0$, there exists $0<x\le1$ such that
+
+$$
+|\varphi^k(x)|<\varepsilon.
+$$
+
+Thus no finite step count gives a uniform positive output bound over all of $(0,1]$. With the Muon coefficients, no scalar trajectory converges to exactly $1$, since every limit must be a fixed point whereas $\varphi(1)=701/1000$.
+
+\end{theorem}
+
+These results are checked by `exists_small_positive_input` and `muon_not_tendsto_one`. A finite-step approximation guarantee must specify an input spectral range and an attainable error tolerance.
+
+<h2 id="cost">Cost verification</h2>
+
+\begin{definition}[Matrix multiplication cost model]
+
+Charge $2pqr$ FLOPs for multiplying a $p\times q$ matrix by a $q\times r$ matrix. This convention counts one multiplication and one addition per inner-product term. For an oriented $m\times n$ input, the factored scheme computes $XX^\top$, $A^2$, and $(bA+cA^2)X$, giving
+
+$$
+C_F(m,n)=4nm^2+2m^3.
+$$
+
+An alternative computes $A=XX^\top$, $Y=AX$, and
+
+$$
+E(X)=aX+bY+cAY,
+\qquad C_E(m,n)=6nm^2.
+$$
+
+The five-step cost is $C_5(m,n)=5C_F(m,n)$.
+
+\end{definition}
+
+\begin{theorem}[Equivalent evaluation and operation savings]
+
+In exact real arithmetic, $F(X)=E(X)$. If $m\le n$, then
+
+$$
+\begin{aligned}
+C_5(m,n)&=5(4nm^2+2m^3),\\
+C_5(m,n)+10m^2(n-m)&=5C_E(m,n),\\
+C_5(m,n)&\le30nm^2.
+\end{aligned}
+$$
+
+Lean checks the evaluation identity and [`muonCost_satisfies_spec`](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/NewtonSchulz/Cost/Correctness.lean). The saving is positive for $0<m<n$ and zero for square inputs.
+
+\end{theorem}
+
+The [cost definitions](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Model/NewtonSchulz/Cost.lean) count the three stipulated dense matrix multiplication calls. The [shared cost proofs](https://github.com/Varifold-Lab/neural-spec/blob/main/NeuralSpec/Verification/Shared/Arithmetic/NewtonSchulzCost.lean) establish the natural-number identities. Scalar operations, normalization, storage, data movement, and communication are excluded. The count is not a compiler or hardware execution model; changed multiplication association can also change floating-point rounding.
+
+<h2 id="scope">Verification scope</h2>
+
+The algorithm layer supplies mathematical definitions and a concrete coefficient configuration. The verification layer states `MuonIterationSpec` and `MuonCostSpec`, then proves them without assuming the target properties. These are kernel-checked theorems, not numerical reports or sampled checker results.
+
+Frobenius normalization with `eps`, momentum, parameter updates, quantitative finite-step spectral error bounds, and bfloat16 execution remain unverified. No correspondence to PyTorch/GPU execution or guarantee of lower training loss, fewer training steps, or shorter wall-clock time is established. XOR instead verifies the output margin of a fixed trained network; both cases use the same separation between definitions, specifications, and proofs.
+
+<h2 id="reproduce">Reproduce</h2>
+
+The project toolchain and dependencies are pinned. From the repository root:
+
+```sh
+lake build
+lake env lean scripts/CheckImports.lean
+lake env lean scripts/CheckShared.lean
+lake env lean scripts/Audit.lean
+```

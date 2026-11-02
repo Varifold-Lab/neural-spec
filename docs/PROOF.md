@@ -1,4 +1,4 @@
-# What is proved
+# XOR: proof scope
 
 The proofs concern the frozen XOR network trained with seed `7` for `1000` Adam steps. Its 22 parameters are defined once in [Parameters.lean](../NeuralSpec/Network/Xor/Parameters.lean), together with their binary32 words, original checkpoint words, and SHA-256 identity. Changing any weight requires a new proof.
 
@@ -65,6 +65,6 @@ python3 scripts/export_checkpoint.py --check
 
 Only the last command requires Python and the original local `artifacts/xor.state`. The pinned Lean, TorchLean, and FloatLib versions are recorded in the repository's toolchain and dependency files.
 
-Validation on 2026-09-30: the build, import checks, and checkpoint export check passed. All 16 audited theorems depend only on `propext`, `Classical.choice`, and `Quot.sound`, with no `sorryAx`, native-evaluation axiom, or assumed network safety property.
+Validation on 2026-09-30: the build, import checks, and checkpoint export check passed. All 16 audited XOR theorems depend only on `propext`, `Classical.choice`, and `Quot.sound`, with no `sorryAx`, native-evaluation axiom, or assumed network safety property.
 
 Separate numerical observations: the saved checkpoint passed all four region checks (minimum reported margin `0.501937`); the one-step checkpoint failed three regions. Native/FloatLib regression testing found zero output-word mismatches on 447 input pairs. These observations do not establish universal native-runtime correctness.

@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { pages } from './lib/pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = new URL('../artifacts/site/', import.meta.url);
@@ -37,7 +38,6 @@ const serverModule = new URL('../artifacts/site-render.cjs', import.meta.url);
 await build({ ...common, entryPoints: ['server.jsx'], outfile: fileURLToPath(serverModule),
   platform: 'node', format: 'cjs', define: { 'process.env.NODE_ENV': '"production"' } });
 const { default: renderer } = await import(serverModule.href);
-const article = renderer.renderPage();
 const client = await build({ ...common, entryPoints: ['client.jsx'],
   outfile: fileURLToPath(new URL('assets/page.js', out)),
   platform: 'browser', format: 'esm', minify: true,
@@ -47,5 +47,13 @@ for (const [file, metadata] of Object.entries(client.metafile.outputs)) {
 }
 const version = createHash('sha256').update(await readFile(new URL('assets/style.css', out))).digest('hex').slice(0, 12);
 const template = await readFile(new URL('./index.html', import.meta.url), 'utf8');
-await writeFile(new URL('index.html', out), template.replace('{{style_version}}', version).replace('{{article}}', article));
+for (const page of pages) {
+  const html = template
+    .replace('{{title}}', page.title)
+    .replace('{{description}}', page.description)
+    .replace('{{case}}', page.id)
+    .replace('{{style_version}}', version)
+    .replace('{{article}}', renderer.renderPage(page.id));
+  await writeFile(new URL(page.file, out), html);
+}
 python('--check');

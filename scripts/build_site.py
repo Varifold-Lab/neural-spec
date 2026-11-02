@@ -99,10 +99,14 @@ def main():
     if args.prepare:
         prepare()
     elif args.check:
-        if re.search(r"{{[^{}]+}}", (OUT / "index.html").read_text()):
-            raise ValueError("Unexpanded placeholder in index.html")
+        pages = list(OUT.rglob("*.html"))
+        if not pages:
+            raise ValueError("No rendered pages")
+        for page in pages:
+            if re.search(r"{{[^{}]+}}", page.read_text()):
+                raise ValueError(f"Unexpanded placeholder in {page.relative_to(OUT)}")
         count = check_links()
-        print(f"Built one page in {OUT.relative_to(ROOT)}; checked {count} local links")
+        print(f"Built {len(pages)} pages in {OUT.relative_to(ROOT)}; checked {count} local links")
     else:
         subprocess.run(["npm", "--prefix", str(SITE), "run", "build"], cwd=ROOT, check=True)
 

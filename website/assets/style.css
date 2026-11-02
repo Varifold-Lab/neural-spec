@@ -21,9 +21,17 @@ button { cursor: pointer; }
 .header-links { display: flex; align-items: center; gap: 1.5rem; }
 .header-links > a { color: var(--muted); font-size: .875rem; text-decoration: none; white-space: nowrap; }
 .site-footer { max-width: 1500px; margin: auto; padding: 1.4rem 32px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 1.5rem; color: var(--muted); font-size: .875rem; }
+.varifold-about { width: min(800px, 100%); margin: auto; }
+.varifold-about h2 { margin: 0 0 .5rem; font-size: 1rem; font-weight: 650; line-height: 1.4; }
+.varifold-about h2 a { color: var(--ink); text-decoration: none; }
+.varifold-about p { margin: 0; }
 
 /* Reading pages and mathematical figures. */
 .article { width: min(800px, calc(100% - 64px)); margin: auto; padding: 42px 0 80px; font-size: 1rem; overflow-wrap: break-word; }
+.case-navigation { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-bottom: 2rem; font-size: .875rem; }
+.case-navigation a { color: var(--muted); text-decoration: none; padding: .2rem 0; border-bottom: 2px solid transparent; }
+.case-navigation a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.case-navigation a:hover { color: var(--accent); }
 .article h1 { font-size: clamp(2rem, 3vw, 2.65rem); line-height: 1.18; font-weight: 650; letter-spacing: -.035em; margin: 0 0 1.4rem; }
 .article h2 { margin: 2.8rem 0 1rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line); font-size: 1.4rem; line-height: 1.4; font-weight: 650; letter-spacing: -.015em; scroll-margin-top: 90px; }
 .article p { margin: .8rem 0 1.2rem; }
@@ -122,7 +130,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); margin: 7px 0; c
   .header-links { gap: .65rem; }
 }
 @media print {
-  .site-header, .site-footer, .animation-toolbar, input[type="range"], .presets, .skip-link { display: none; }
+  .site-header, .site-footer, .case-navigation, .animation-toolbar, input[type="range"], .presets, .skip-link { display: none; }
   .article { max-width: none; padding: 0; }
   a { color: inherit; }
   .article .katex-display, pre { overflow: visible; }

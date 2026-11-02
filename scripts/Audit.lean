@@ -19,3 +19,20 @@ import NeuralSpec
 #print axioms NeuralSpec.Xor.floatLibNetwork_margin_real
 #print axioms NeuralSpec.Xor.floatLibNetwork_sub_margin
 #print axioms NeuralSpec.Xor.floatLibNetwork_sub_margin_real
+
+#print axioms NeuralSpec.NewtonSchulz.scalarIterate_zero
+#print axioms NeuralSpec.NewtonSchulz.matrixIterate_zero
+#print axioms NeuralSpec.NewtonSchulz.matrixIterate_transpose
+#print axioms NeuralSpec.NewtonSchulz.matrixStep_factorization
+#print axioms NeuralSpec.NewtonSchulz.matrixIterate_factorization
+#print axioms NeuralSpec.NewtonSchulz.matrixIterate_preserves_kernel
+#print axioms NeuralSpec.NewtonSchulz.exists_small_positive_input
+#print axioms NeuralSpec.NewtonSchulz.scalarIterate_limit_fixed
+#print axioms NeuralSpec.NewtonSchulz.muon_one
+#print axioms NeuralSpec.NewtonSchulz.muon_not_tendsto_one
+#print axioms NeuralSpec.NewtonSchulz.matrixStep_eq_expanded
+#print axioms NeuralSpec.NewtonSchulz.factoredStepMatmulFlops_saving
+#print axioms NeuralSpec.NewtonSchulz.muonIteration_satisfies_spec
+#print axioms NeuralSpec.NewtonSchulz.muonMatmulFlops_eq
+#print axioms NeuralSpec.NewtonSchulz.muonMatmulFlops_saving
+#print axioms NeuralSpec.NewtonSchulz.muonCost_satisfies_spec

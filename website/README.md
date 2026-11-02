@@ -1,6 +1,6 @@
 # Website source
 
-The XOR page is authored in [xor.mdx](xor.mdx) with React components. Requires Node.js 22 or later and Python 3. Run from the repository root:
+The two verification cases are authored in [xor.mdx](xor.mdx) and [newton-schulz.mdx](newton-schulz.mdx). Each occupies one page; there is no separate landing page. [lib/pages.mjs](lib/pages.mjs) defines metadata and case navigation. Requires Node.js 22 or later and Python 3. Run from the repository root:
 
 ```sh
 npm --prefix website ci
@@ -9,7 +9,7 @@ npm --prefix website test
 python3 -m http.server 4175 --bind 127.0.0.1 --directory artifacts/site
 ```
 
-Preview at http://127.0.0.1:4175/. The build extracts the frozen parameters, checks their encodings and local links, and renders static HTML before hydration.
+Preview XOR at http://127.0.0.1:4175/ and Newton–Schulz at http://127.0.0.1:4175/newton-schulz.html. The build extracts the frozen XOR parameters, checks their encodings and both pages' local links, and renders static HTML before hydration. The client hydrates the case identified by the page's `data-case` attribute.
 
 Use `$...$` for inline mathematics and `$$...$$` for display mathematics. Shared macros are `\R`, `\ReLU`, `\XorSpec`, and `\RN`.
 

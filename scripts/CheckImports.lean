@@ -15,6 +15,9 @@ assert_not_exists NeuralSpec.FloatingError.round_error
 assert_not_exists NeuralSpec.Robustness.correct_of_margin
 assert_not_exists NeuralSpec.Xor.trainer
 assert_not_exists NeuralSpec.Xor.checkRegions
+assert_not_exists NeuralSpec.NewtonSchulz.matrixIterate_factorization
+assert_not_exists NeuralSpec.NewtonSchulz.MuonIterationSpec
+assert_not_exists NeuralSpec.NewtonSchulz.MuonCostSpec
 
 #check NeuralSpec.Xor.model
 #check NeuralSpec.MLP.oneHiddenLayer

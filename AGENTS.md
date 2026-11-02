@@ -3,6 +3,7 @@
 - Write project content, documentation, and code comments in English. Communicate with the user in Chinese.
 - Keep documentation concise, factual, and academic. State each definition, result, and limitation once; omit slogans, reading advice, and generic contribution prose. Match the Varifold community website’s visual style. Explain the example rather than promoting dependency libraries; identify the arithmetic model precisely without repeating library names. Keep the current XOR example on one concise page; do not add landing pages, guides, or per-section pages.
 - Reuse the AI Safety documentation header and reading styles: `Varifold / project` at the left, with Varifold linking to the community home, and GitHub at the right. Compare the actual project pages before changing navigation or controls.
+- Use the heading `Varifold` and this community introduction verbatim: "Varifold is an open learning community studying formal verification, interpretability, and mathematical foundations of AI safety. We develop and share notes, tools, and open-source projects to support learning and verifiable knowledge discovery."
 - Use the pinned Lean and TorchLean revisions. Keep `lake-manifest.json` committed.
 - Keep the four exact input regions and the 1/4 margin aligned with `NeuralSpec/Verification/Xor/Robustness/Spec.lean`.
 - Distinguish a numerical report, a checker result, and a kernel-checked theorem.

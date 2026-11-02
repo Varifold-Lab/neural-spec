@@ -1,2 +1,4 @@
 import NeuralSpec.Verification.Xor.Robustness.Correctness
 import NeuralSpec.Verification.Xor.Robustness.FloatingPoint
+import NeuralSpec.Verification.NewtonSchulz.Iteration.Correctness
+import NeuralSpec.Verification.NewtonSchulz.Cost.Correctness

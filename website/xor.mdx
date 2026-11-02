@@ -3,9 +3,9 @@ import { MathStatement } from './components/MathStatement.jsx';
 
 # XOR
 
-XOR (exclusive OR) assigns to two bits $a,b\in\{0,1\}$ the label $a\oplus b=(a+b)\bmod 2$: 1 when they differ and 0 when they agree. This case verifies a trained network on continuous regions around the four binary inputs.
+XOR (exclusive OR) assigns to two bits $a,b\in\{0,1\}$ the label $a\oplus b=(a+b)\bmod 2$: 1 when they differ and 0 when they agree. Training supplies a frozen network; verification proves its classification margin on continuous regions around the four binary inputs. The training algorithm itself is outside this case's proof scope.
 
-<h2 id="network">Network</h2>
+<h2 id="network">Model and training</h2>
 
 \begin{definition}[Trained network over the reals]
 
@@ -34,7 +34,7 @@ The four hidden coordinates are indexed by $i\in\{0,1,2,3\}$; the two class scor
 
 The hidden layer multiplies inputs by weights, adds biases, and sets negative results to zero. The output layer combines the hidden values into two scores; the larger score selects the class. Scores are not probabilities. Training fixes the 22 coefficients after 1,000 Adam steps with seed 7, using 36 labelled examples.
 
-<h2 id="specification">Specification</h2>
+<h2 id="specification">Real-arithmetic verification</h2>
 
 \begin{definition}[Input regions and correct labels]
 
@@ -95,7 +95,7 @@ Fixing the signs of the four preactivations $a_i(x)$ makes the margin affine. Fo
 
 <XorAnimation />
 
-<h2 id="proof">Binary32 arithmetic</h2>
+<h2 id="proof">Binary32 verification</h2>
 
 \begin{definition}[Rounded evaluation]
 
